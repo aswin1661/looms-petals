@@ -1,0 +1,169 @@
+.container {
+  position: relative;
+  width: 100%;
+  padding: 20px 0;
+  overflow: hidden;
+}
+
+.carousel {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 0 56px; /* breathing room for arrows */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  position: relative;
+  flex: 0 0 320px; /* visual width similar to screenshot */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.innerPanel {
+  position: relative;
+  height: 420px;
+  padding: 28px 22px 130px; /* leave space at bottom for shoe */
+  border-radius: 28px;
+  background: #f6dfe6; /* soft pink */
+  box-shadow: 0 8px 22px rgba(255, 155, 175, 0.12);
+  overflow: hidden; /* ensure child image never overflows, border sits above */
+}
+
+/* Overlay inner border ABOVE content so it never hides behind the image */
+.innerPanel::after {
+  content: "";
+  position: absolute;
+  inset: 0; /* border aligns to panel sides */
+  border: 6px solid #eec8d3; /* visible ring at the edges */
+  border-radius: 28px; /* match panel radius */
+  pointer-events: none;
+  z-index: 2; /* ensure it's above the image */
+}
+
+.logoContainer {
+  position: relative;
+  height: 40px;
+  margin: 4px auto 24px;
+}
+
+.brandText {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: 1px;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.priceType {
+  font-size: 18px;
+  color: #222;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.price {
+  font-size: 36px;
+  font-weight: 800;
+  color: #000;
+  display: flex;
+  align-items: center;
+}
+
+.rupee {
+  font-size: 24px;
+  margin-right: 2px;
+}
+
+.discount {
+  font-size: 16px;
+  color: #ff4444;
+  font-weight: bold;
+}
+
+.discountBig {
+  font-size: 38px;
+  font-weight: 900;
+}
+
+.imageContainer {
+  position: absolute;
+  left: 10%;
+  border-radius: 28px 28px 0 0; /* align with panel radius */
+  right: 10%;
+  bottom: 0; /* keep image inside panel */
+  height: 190px;
+}
+
+/* Apply rounded corners to actual <img> elements rendered by next/image */
+.imageContainer :global(img) {
+  border-radius: 28px 28px 0 0; /* align with panel radius */
+}
+
+/* Keep logos unrounded (logos are usually flat) */
+
+.navButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #333;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.navButton:hover {
+  background: #f5f5f5;
+}
+
+.prevButton {
+  left: 10px;
+}
+
+.nextButton {
+  right: 10px;
+}
+
+@media (max-width: 768px) {
+  .card {
+    flex: 0 0 260px;
+  }
+  
+  .navButton {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+}

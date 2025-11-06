@@ -5,10 +5,12 @@ import styles from './Carousel.module.css';
 import { carouselData } from './carouselData';
 
 function Carousels() {
+  // Only show image-based hero slides for the home banner
+  const heroSlides = carouselData.filter((s) => !!s.image);
   return (
     <div className={styles['carousel-wrapper']}>
       <Carousel className={styles.carousel}>
-        {carouselData.map((slide, index) => (
+        {heroSlides.map((slide, index) => (
           <Carousel.Item key={slide.id} interval={4000}>
             <div className={styles['carousel-card']}>
               <div className={styles['carousel-image-container']}>
@@ -16,7 +18,7 @@ function Carousels() {
                   src={slide.image as string} 
                   alt={`Slide ${index + 1}`}
                   fill
-                  sizes="80vw"
+                  sizes="100vw"
                   style={{ 
                     objectFit: 'cover',
                     objectPosition: 'center'

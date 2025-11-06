@@ -1,7 +1,6 @@
 /* Custom styles that override Bootstrap */
 .carousel-wrapper {
   width: 100vw;
-  padding-top: 4vh;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -10,17 +9,15 @@
 }
 
 .carousel {
-  width: 85vw;
-  height: 63vh;
+  width: 100vw;
+  height: 72vh;
 }
 
 .carousel :global(.carousel-inner) {
   height: 100%;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 0px;
 }
-
-/* Shadow for light theme inner */
+/* Shadow for light theme only */
 :global(html:not(.dark)) .carousel :global(.carousel-inner) {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12),
               0 0 0 1px rgba(0, 0, 0, 0.05);
@@ -31,13 +28,13 @@
 }
 
 .carousel-card {
-  width: 85vw;
-  height: 90vh;
+  width: 100vw;
+  height: 72vh;
   position: relative;
   background: #000;
-  border-radius: 10px;
+  border-radius: 0px;
   overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: none;
 }
 
 /* Shadow for light theme only */
@@ -55,32 +52,41 @@
 
 .carousel :global(.carousel-caption) {
   position: absolute !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  background: rgba(0, 0, 0, 0) !important;
-  top: 50% !important;
+  bottom: 78px !important;
   left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  padding: 2rem !important;
-  color: white !important;
-  z-index: 2;
-  width: 80% !important;
-  pointer-events: none !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  display: block !important;
+  padding: 12px 16px !important;
+  border-radius: 10px !important;
+  width: max(280px, 32vw) !important;
+  max-width: 60vw !important;
+  color: #fff !important;
+  text-align: center !important;
+}
+
+.carousel :global(.carousel-caption h3) {
+  margin: 0 0 6px !important;
+  font-size: clamp(18px, 2.4vw, 28px) !important;
+  font-weight: 700 !important;
+  text-shadow: 0 2px 8px rgba(0,0,0,.5) !important;
+}
+
+.carousel :global(.carousel-caption p) {
+  margin: 0 !important;
+  font-size: clamp(12px, 1.4vw, 16px) !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,.5) !important;
 }
 
 .carousel :global(.carousel-control-prev),
 .carousel :global(.carousel-control-next) {
   z-index: 10 !important;
-  width: 15% !important;
-  opacity: 0.8 !important;
+  width: 8% !important;
 }
 
-.carousel :global(.carousel-control-prev:hover),
-.carousel :global(.carousel-control-next:hover) {
-  opacity: 1 !important;
-  background: rgba(0, 0, 0, 0) !important;
+.carousel :global(.carousel-control-prev-icon),
+.carousel :global(.carousel-control-next-icon) {
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.25));
 }
 
 .carousel :global(.carousel-caption h3) {
@@ -90,6 +96,7 @@
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9) !important;
   margin-bottom: 1.1rem !important;
   text-transform: uppercase !important;
+  text-align: center !important;
 }
 
 .carousel :global(.carousel-caption p) {
@@ -103,17 +110,21 @@
 
 .carousel :global(.carousel-indicators) {
   z-index: 10 !important;
-  margin-bottom: 1rem !important;
+  margin-bottom: 10px !important;
 }
 
 .carousel :global(.carousel-indicators button) {
-  width: 12px !important;
-  height: 12px !important;
-  border-radius: 50% !important;
-  background-color: rgba(255, 255, 255, 0.5) !important;
-  margin: 0 5px !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 100% !important;
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  margin: 0 4px !important;
+  transition: width .2s ease;
 }
 
 .carousel :global(.carousel-indicators .active) {
-  background-color: white !important;
+  background-color: #fff !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 100% !important;
 }
