@@ -128,3 +128,47 @@
   height: 10px !important;
   border-radius: 100% !important;
 }
+
+/* Mobile responsiveness - hide navigation buttons */
+@media (max-width: 768px) {
+  .carousel :global(.carousel-control-prev),
+  .carousel :global(.carousel-control-next) {
+    display: none !important;
+  }
+  
+  .carousel {
+    height: 50vh;
+  }
+  
+  .carousel-card {
+    height: 50vh;
+  }
+  
+  .carousel :global(.carousel-caption) {
+    bottom: 40px !important;
+    width: 80% !important;
+    max-width: 80% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel :global(.carousel-control-prev),
+  .carousel :global(.carousel-control-next) {
+    display: none !important;
+  }
+  
+  .carousel {
+    height: 70vh;
+  }
+  
+  .carousel-card {
+    height: 70vh;
+  }
+  
+  .carousel :global(.carousel-caption) {
+    bottom: 30px !important;
+    padding: 8px 12px !important;
+    width: 90% !important;
+    max-width: 90% !important;
+  }
+}

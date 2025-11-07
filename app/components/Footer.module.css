@@ -1,0 +1,313 @@
+.footer {
+  background: linear-gradient(135deg, #7a2d2d 0%, #5a1f1f 100%);
+  color: #ffffff;
+  padding: 60px 0 0;
+  margin-top: 80px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 48px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Brand Section */
+.brandName {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.tagline {
+  font-size: 15px;
+  color: #f5d5d5;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+  max-width: 280px;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.socialIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.socialIcon:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Column Titles */
+.columnTitle {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Links */
+.linkList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.link {
+  color: #f5d5d5;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.link:hover {
+  color: #ffffff;
+  padding-left: 4px;
+}
+
+/* Bottom Bar */
+.bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 24px 0;
+}
+
+.bottomContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.copyright {
+  font-size: 14px;
+  color: #e5c5c5;
+  margin: 0;
+}
+
+.bottomLinks {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bottomLink {
+  color: #e5c5c5;
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.3s ease;
+}
+
+.bottomLink:hover {
+  color: #ffffff;
+}
+
+.separator {
+  color: #e5c5c5;
+  font-size: 13px;
+}
+
+/* Tablet responsiveness */
+@media (max-width: 768px) {
+  .footer {
+    padding: 48px 0 0;
+    margin-top: 60px;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 32px;
+    margin-bottom: 40px;
+  }
+
+  .column:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .brandName {
+    font-size: 24px;
+  }
+
+  .tagline {
+    font-size: 14px;
+    max-width: 100%;
+  }
+
+  .socialLinks {
+    gap: 10px;
+  }
+
+  .socialIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .socialIcon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .columnTitle {
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+
+  .linkList {
+    gap: 10px;
+  }
+
+  .link {
+    font-size: 13px;
+  }
+
+  .bottom {
+    padding: 20px 0;
+  }
+
+  .bottomContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .copyright {
+    font-size: 13px;
+  }
+
+  .bottomLink {
+    font-size: 12px;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .footer {
+    padding: 40px 0 0;
+    margin-top: 50px;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+
+  .column:first-child {
+    grid-column: 1;
+    text-align: center;
+    align-items: center;
+  }
+
+  .brandName {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .tagline {
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .socialLinks {
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .socialIcon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .socialIcon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .columnTitle {
+    font-size: 14px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .linkList {
+    gap: 9px;
+    align-items: center;
+  }
+
+  .link {
+    font-size: 13px;
+  }
+
+  .link:hover {
+    padding-left: 0;
+  }
+
+  .bottom {
+    padding: 18px 0;
+  }
+
+  .bottomContent {
+    gap: 10px;
+  }
+
+  .copyright {
+    font-size: 12px;
+  }
+
+  .bottomLinks {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .separator {
+    display: none;
+  }
+
+  .bottomLink {
+    font-size: 12px;
+  }
+}

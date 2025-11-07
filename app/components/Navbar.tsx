@@ -89,10 +89,21 @@ const Icon = {
       <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
     </svg>
   ),
+  Menu: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  ),
+  Close: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  ),
 };
 
 export function Navbar() {
   const [active, setActive] = useState('Diamond');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
   const menu = [
@@ -105,10 +116,24 @@ export function Navbar() {
     { key: 'More', icon: <Icon.Brand />, label: 'More' },
   ];
 
+  const handleMenuClick = (key: string) => {
+    setActive(key);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <nav className="tnq-navbar">
       {/* Top Row */}
       <div className="tnq-row tnq-row-top">
+        {/* Mobile Menu Toggle */}
+        <button 
+          className="tnq-mobile-menu-toggle"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <Icon.Close /> : <Icon.Menu />}
+        </button>
+
         <div className="tnq-brand">
           <span className="tnq-brand-text">LOOMS & PETALS</span>
         </div>
@@ -119,15 +144,17 @@ export function Navbar() {
           <div className="tnq-search-actions">
           </div>
         </div>
-      </div>
 
         <button 
-          className="tnq-about-btn"
+          className="tnq-about-btn tnq-desktop-about"
           onClick={() => router.push('/about')}
         >
           About Us
-        </button>      {/* Menu Row */}
-      <div className="tnq-row justify-center tnq-row-menu">
+        </button>
+      </div>
+
+      {/* Desktop Menu Row */}
+      <div className="tnq-row justify-center tnq-row-menu tnq-desktop-menu">
         {menu.map((m) => (
           <button
             key={m.key}
@@ -138,6 +165,30 @@ export function Navbar() {
             <span className="tnq-menu-label">{m.label}</span>
           </button>
         ))}
+      </div>
+
+      {/* Mobile Menu Dropdown */}
+      <div className={`tnq-mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+        {menu.map((m) => (
+          <button
+            key={m.key}
+            onClick={() => handleMenuClick(m.key)}
+            className={`tnq-mobile-menu-item ${active === m.key ? 'active' : ''}`}
+          >
+            <span className="tnq-menu-icon" aria-hidden>{m.icon}</span>
+            <span className="tnq-menu-label">{m.label}</span>
+          </button>
+        ))}
+        {/* About Us Button in Mobile Menu */}
+        <button
+          className="tnq-mobile-menu-item tnq-mobile-about"
+          onClick={() => {
+            router.push('/about');
+            setMobileMenuOpen(false);
+          }}
+        >
+            <span className="tnq-menu-label">About Us</span>
+        </button>
       </div>
     </nav>
   );
