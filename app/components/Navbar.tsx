@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import CartIcon from './CartIcon';
 
 // Simple inline SVG icon components (stroke inherits currentColor)
 const Icon = {
@@ -145,12 +146,15 @@ export function Navbar() {
           </div>
         </div>
 
-        <button 
-          className="tnq-about-btn tnq-desktop-about"
-          onClick={() => router.push('/about')}
-        >
-          About Us
-        </button>
+        <div className="tnq-nav-actions">
+          <CartIcon />
+          <button 
+            className="tnq-about-btn tnq-desktop-about"
+            onClick={() => router.push('/about')}
+          >
+            About Us
+          </button>
+        </div>
       </div>
 
       {/* Desktop Menu Row */}

@@ -98,6 +98,17 @@ body {
   letter-spacing: 0.5px;
 }
 
+/* Nav Actions Container */
+.tnq-nav-actions {
+  position: absolute;
+  right: 5vw;
+  top: 48%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .tnq-about-btn:hover {
   background: #fff5f5;
   box-shadow: 0 4px 8px rgba(122, 45, 45, 0.15);

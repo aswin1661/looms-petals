@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import { useCart } from "../../context/CartContext";
 import styles from "./ProductPage.module.css";
 
 type Product = {
@@ -35,12 +36,14 @@ const ProductSkeleton = () => (
 export default function ProductPage() {
 	const params = useParams();
 	const router = useRouter();
+	const { addToCart, setIsCartOpen, items } = useCart();
 	const [product, setProduct] = useState<Product | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [selectedSize, setSelectedSize] = useState<string>("");
 	const [selectedColor, setSelectedColor] = useState<string>("");
 	const [quantity, setQuantity] = useState(1);
 	const [currentImage, setCurrentImage] = useState(0);
+	const [addingToCart, setAddingToCart] = useState(false);
 
 	const fetchProduct = useCallback(async (slug: string) => {
 		try {
@@ -95,6 +98,89 @@ export default function ProductPage() {
 	const handleImageChange = useCallback((index: number) => {
 		setCurrentImage(index);
 	}, []);
+
+	const handleAddToCart = useCallback(() => {
+		if (!product) return;
+
+		// Validate selections
+		if (product.sizes?.length > 0 && !selectedSize) {
+			alert("Please select a size");
+			return;
+		}
+		if (product.colors?.length > 0 && !selectedColor) {
+			alert("Please select a color");
+			return;
+		}
+
+		setAddingToCart(true);
+
+		const success = addToCart({
+			id: product.id,
+			name: product.name,
+			price: product.price,
+			discount_price: product.discount_price,
+			image_url: product.image_url,
+			selectedSize: selectedSize || undefined,
+			selectedColor: selectedColor || undefined,
+			brand: product.brand || '',
+			category: product.category,
+			stock: product.stock,
+		}, quantity);
+
+		if (success) {
+			// Show cart sidebar
+			setIsCartOpen(true);
+		} else {
+			// Stock exceeded
+			alert(`Cannot add to cart. Only ${product.stock} items available in stock.`);
+		}
+
+		// Reset adding state
+		setTimeout(() => setAddingToCart(false), 300);
+	}, [product, quantity, selectedSize, selectedColor, addToCart, setIsCartOpen]);
+
+	const handleBuyNow = useCallback(() => {
+		handleAddToCart();
+		router.push("/checkout");
+	}, [handleAddToCart, router]);
+
+	// Calculate quantity already in cart
+	const quantityInCart = useMemo(() => {
+		if (!product) return 0;
+		
+		return items
+			.filter(
+				(item) =>
+					item.id === product.id &&
+					item.selectedSize === (selectedSize || undefined) &&
+					item.selectedColor === (selectedColor || undefined)
+			)
+			.reduce((sum, item) => sum + item.quantity, 0);
+	}, [items, product, selectedSize, selectedColor]);
+
+	// Check if any variant of this product is in cart (for button display)
+	const isInCart = useMemo(() => {
+		if (!product) return false;
+		return items.some((item) => item.id === product.id);
+	}, [items, product]);
+
+	// Get total quantity of this product in cart (all variants)
+	const totalInCart = useMemo(() => {
+		if (!product) return 0;
+		return items
+			.filter((item) => item.id === product.id)
+			.reduce((sum, item) => sum + item.quantity, 0);
+	}, [items, product]);
+
+	// Calculate available quantity to add
+	const availableToAdd = useMemo(() => {
+		if (!product) return 0;
+		return product.stock - quantityInCart;
+	}, [product, quantityInCart]);
+
+	const handleViewCart = useCallback(() => {
+		setIsCartOpen(true);
+	}, [setIsCartOpen]);
 
 	if (loading) {
 		return <ProductSkeleton />;
@@ -283,16 +369,23 @@ export default function ProductPage() {
 									onClick={() => handleQuantityChange(1)}
 									className={styles.qtyBtn}
 									aria-label="Increase quantity"
-									disabled={quantity >= product.stock}
+									disabled={quantity >= availableToAdd}
 								>
 									+
 								</button>
 							</div>
 							<p className={styles.stockInfo}>
 								{product.stock > 0 ? (
-									<span className={styles.inStock}>
-										{product.stock} items in stock
-									</span>
+									<>
+										<span className={styles.inStock}>
+											{product.stock} items in stock
+										</span>
+										{quantityInCart > 0 && (
+											<span className={styles.cartInfo}>
+												{" "}• {quantityInCart} already in cart
+											</span>
+										)}
+									</>
 								) : (
 									<span className={styles.outOfStock}>Out of stock</span>
 								)}
@@ -301,15 +394,26 @@ export default function ProductPage() {
 
 						{/* Action Buttons */}
 						<div className={styles.actions}>
-							<button
-								className={styles.addToCartBtn}
-								disabled={product.stock === 0}
-							>
-								Add to Cart
-							</button>
+							{isInCart ? (
+								<button
+									className={styles.viewCartBtn}
+									onClick={handleViewCart}
+								>
+									View Cart ({totalInCart})
+								</button>
+							) : (
+								<button
+									className={styles.addToCartBtn}
+									disabled={product.stock === 0 || addingToCart}
+									onClick={handleAddToCart}
+								>
+									{addingToCart ? "Adding..." : "Add to Cart"}
+								</button>
+							)}
 							<button
 								className={styles.buyNowBtn}
 								disabled={product.stock === 0}
+								onClick={handleBuyNow}
 							>
 								Buy Now
 							</button>
