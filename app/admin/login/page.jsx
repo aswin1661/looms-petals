@@ -42,17 +42,13 @@ export default function AdminLogin() {
       });
 
       const data = await response.json();
-      console.log('Login response:', data);
 
       if (response.ok) {
-        console.log('Login successful! Redirecting...');
-        // Force redirect using window.location for reliability
         window.location.href = '/admin/dashboard';
       } else {
         setError(data.message || 'Login failed');
       }
     } catch (error) {
-      console.error('Login error:', error);
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);

@@ -8,10 +8,7 @@ async function verifyAdmin() {
     const cookieStore = await cookies();
     const token = cookieStore.get('admin_token')?.value;
 
-    console.log('🔐 Verifying admin, token:', token ? 'Found' : 'Not found');
-
     if (!token) {
-      console.log('❌ No token found');
       return null;
     }
 
@@ -24,11 +21,8 @@ async function verifyAdmin() {
       .single();
 
     if (sessionError || !session) {
-      console.log('❌ Session not found or expired:', sessionError?.message);
       return null;
     }
-
-    console.log('✅ Session found, user_id:', session.user_id);
 
     // Get user
     const { data: user, error: userError } = await supabaseAdmin
@@ -37,20 +31,13 @@ async function verifyAdmin() {
       .eq('id', session.user_id)
       .single();
 
-    if (userError || !user) {
-      console.log('❌ User not found:', userError?.message);
+    if (userError || !user || user.role !== 'admin') {
       return null;
     }
 
-    if (user.role !== 'admin') {
-      console.log('❌ User is not admin, role:', user.role);
-      return null;
-    }
-
-    console.log('✅ Admin verified:', user.email);
     return user;
   } catch (error) {
-    console.error('❌ verifyAdmin error:', error);
+    console.error('Admin verification error:', error);
     return null;
   }
 }
@@ -113,31 +100,24 @@ export async function GET(request) {
 // POST - Create new product (Admin only)
 export async function POST(request) {
   try {
-    console.log('\n========== CREATE PRODUCT ==========');
     const admin = await verifyAdmin();
     if (!admin) {
-      console.log('❌ Unauthorized - no admin session');
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    console.log('✅ Admin verified:', admin.email);
-
     const body = await request.json();
-    console.log('📦 Product data received:', body);
 
     // Validate required fields
     if (!body.name || !body.price || !body.category) {
-      console.log('❌ Missing required fields');
       return NextResponse.json(
         { success: false, message: 'Name, price, and category are required' },
         { status: 400 }
       );
     }
 
-    console.log('🔍 Inserting product into database...');
     const { data, error } = await supabaseAdmin
       .from('products')
       .insert([
@@ -164,21 +144,19 @@ export async function POST(request) {
       .single();
 
     if (error) {
-      console.error('❌ Database error:', error);
+      console.error('Database error:', error);
       return NextResponse.json(
         { success: false, message: 'Failed to create product', error: error.message },
         { status: 500 }
       );
     }
 
-    console.log('✅ Product created successfully:', data.id);
-
     return NextResponse.json(
       { success: true, message: 'Product created successfully', data },
       { status: 201 }
     );
   } catch (error) {
-    console.error('❌ POST Error:', error);
+    console.error('Product creation error:', error);
     return NextResponse.json(
       { success: false, message: 'Failed to create product' },
       { status: 500 }
@@ -189,10 +167,8 @@ export async function POST(request) {
 // PUT - Update product (Admin only)
 export async function PUT(request) {
   try {
-    console.log('\n========== UPDATE PRODUCT ==========');
     const admin = await verifyAdmin();
     if (!admin) {
-      console.log('❌ Unauthorized');
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }
@@ -203,7 +179,6 @@ export async function PUT(request) {
     const id = searchParams.get('id');
 
     if (!id) {
-      console.log('❌ Missing product ID');
       return NextResponse.json(
         { success: false, message: 'Product ID is required' },
         { status: 400 }
@@ -211,7 +186,6 @@ export async function PUT(request) {
     }
 
     const body = await request.json();
-    console.log('📦 Updating product:', id);
 
     const updateData = {
       name: body.name,
@@ -237,21 +211,19 @@ export async function PUT(request) {
       .single();
 
     if (error) {
-      console.error('❌ Update error:', error);
+      console.error('Update error:', error);
       return NextResponse.json(
         { success: false, message: 'Failed to update product' },
         { status: 500 }
       );
     }
 
-    console.log('✅ Product updated successfully');
-
     return NextResponse.json(
       { success: true, message: 'Product updated successfully', data },
       { status: 200 }
     );
   } catch (error) {
-    console.error('❌ PUT Error:', error);
+    console.error('Product update error:', error);
     return NextResponse.json(
       { success: false, message: 'Failed to update product' },
       { status: 500 }
@@ -262,10 +234,8 @@ export async function PUT(request) {
 // DELETE - Delete product (Admin only)
 export async function DELETE(request) {
   try {
-    console.log('\n========== DELETE PRODUCT ==========');
     const admin = await verifyAdmin();
     if (!admin) {
-      console.log('❌ Unauthorized');
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }
@@ -276,14 +246,11 @@ export async function DELETE(request) {
     const id = searchParams.get('id');
 
     if (!id) {
-      console.log('❌ Missing product ID');
       return NextResponse.json(
         { success: false, message: 'Product ID is required' },
         { status: 400 }
       );
     }
-
-    console.log('🗑️ Deleting product:', id);
 
     const { error } = await supabaseAdmin
       .from('products')
@@ -291,21 +258,19 @@ export async function DELETE(request) {
       .eq('id', id);
 
     if (error) {
-      console.error('❌ Delete error:', error);
+      console.error('Delete error:', error);
       return NextResponse.json(
         { success: false, message: 'Failed to delete product' },
         { status: 500 }
       );
     }
 
-    console.log('✅ Product deleted successfully');
-
     return NextResponse.json(
       { success: true, message: 'Product deleted successfully', data: { id } },
       { status: 200 }
     );
   } catch (error) {
-    console.error('❌ DELETE Error:', error);
+    console.error('Product deletion error:', error);
     return NextResponse.json(
       { success: false, message: 'Failed to delete product' },
       { status: 500 }
