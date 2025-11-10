@@ -38,10 +38,23 @@ const ScrollTrendJewel = () => {
               const price = product.discount_price || product.price;
               const existing = brandMap.get(product.brand);
               
+              // Parse image_url to get the first image if it's an array
+              let imageUrl = `https://picsum.photos/seed/${product.brand}/800/600`;
+              if (product.image_url) {
+                try {
+                  const images = JSON.parse(product.image_url);
+                  imageUrl = Array.isArray(images) && images.length > 0 && images[0]
+                    ? images[0]
+                    : (product.image_url || imageUrl);
+                } catch {
+                  imageUrl = product.image_url || imageUrl;
+                }
+              }
+              
               if (!existing || price < existing.minPrice) {
                 brandMap.set(product.brand, {
                   minPrice: price,
-                  image: product.image_url || `https://picsum.photos/seed/${product.brand}/800/600`,
+                  image: imageUrl,
                   count: existing ? existing.count + 1 : 1
                 });
               } else {

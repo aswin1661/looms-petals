@@ -76,6 +76,20 @@ export default function CardSection() {
 			<div className={styles.grid}>
 				{trendingProducts.map((product) => {
 					const slug = product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+					
+					// Parse image_url to get the first image if it's an array
+					let imageUrl = `https://picsum.photos/seed/${product.id}/600/700`;
+					if (product.image_url) {
+						try {
+							const images = JSON.parse(product.image_url);
+							imageUrl = Array.isArray(images) && images.length > 0 && images[0]
+								? images[0]
+								: (product.image_url || imageUrl);
+						} catch {
+							imageUrl = product.image_url || imageUrl;
+						}
+					}
+					
 					return (
 					<div 
 						key={product.id} 
@@ -84,7 +98,7 @@ export default function CardSection() {
 					>
 						<div className={styles.imageContainer}>
 							<img
-								src={product.image_url || `https://picsum.photos/seed/${product.id}/600/700`}
+								src={imageUrl}
 								alt={product.name}
 								loading="lazy"
 							/>

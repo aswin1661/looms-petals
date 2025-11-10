@@ -18,12 +18,13 @@ export default function AdminDashboard() {
     discount_price: '',
     category: '',
     brand: '',
-    image_url: '',
+    image_url: [],
     stock: '',
     status: 'normal',
     type: 'clothing',
     is_featured: false,
   });
+  const [imageInput, setImageInput] = useState('');
 
   useEffect(() => {
     checkAuth();
@@ -94,6 +95,18 @@ export default function AdminDashboard() {
 
   const handleEdit = (product) => {
     setEditingProduct(product);
+    // Parse image_url - it might be a JSON array string or a single URL
+    let images = [];
+    if (product.image_url) {
+      try {
+        images = JSON.parse(product.image_url);
+        if (!Array.isArray(images)) {
+          images = [product.image_url];
+        }
+      } catch {
+        images = [product.image_url];
+      }
+    }
     setFormData({
       name: product.name,
       description: product.description || '',
@@ -101,7 +114,7 @@ export default function AdminDashboard() {
       discount_price: product.discount_price || '',
       category: product.category,
       brand: product.brand || '',
-      image_url: product.image_url || '',
+      image_url: images,
       stock: product.stock,
       status: product.status || 'normal',
       type: product.type || 'clothing',
@@ -134,17 +147,35 @@ export default function AdminDashboard() {
       discount_price: '',
       category: '',
       brand: '',
-      image_url: '',
+      image_url: [],
       stock: '',
       status: 'normal',
       type: 'clothing',
       is_featured: false,
     });
+    setImageInput('');
   };
 
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
+  };
+
+  const addImageUrl = () => {
+    if (imageInput.trim()) {
+      setFormData({
+        ...formData,
+        image_url: [...formData.image_url, imageInput.trim()]
+      });
+      setImageInput('');
+    }
+  };
+
+  const removeImageUrl = (index) => {
+    setFormData({
+      ...formData,
+      image_url: formData.image_url.filter((_, i) => i !== index)
+    });
   };
 
   if (loading) {
@@ -191,11 +222,23 @@ export default function AdminDashboard() {
 
         {/* Products Grid */}
         <div className={styles.grid}>
-          {products.map((product) => (
+          {products.map((product) => {
+            // Parse image_url to get first image
+            let imageUrl = 'https://picsum.photos/400/600';
+            if (product.image_url) {
+              try {
+                const images = JSON.parse(product.image_url);
+                imageUrl = Array.isArray(images) && images.length > 0 ? images[0] : product.image_url;
+              } catch {
+                imageUrl = product.image_url;
+              }
+            }
+            
+            return (
             <div key={product.id} className={styles.card}>
               <div className={styles.cardImage}>
                 <img
-                  src={product.image_url || 'https://picsum.photos/400/600'}
+                  src={imageUrl}
                   alt={product.name}
                 />
                 {product.is_featured && (
@@ -238,7 +281,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {products.length === 0 && (
@@ -378,14 +422,63 @@ export default function AdminDashboard() {
               </div>
 
               <div className={styles.formGroup}>
-                <label>Image URL</label>
-                <input
-                  type="url"
-                  name="image_url"
-                  value={formData.image_url}
-                  onChange={handleChange}
-                  placeholder="https://example.com/image.jpg"
-                />
+                <label>Image URLs</label>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                  <input
+                    type="url"
+                    value={imageInput}
+                    onChange={(e) => setImageInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addImageUrl())}
+                    placeholder="https://example.com/image.jpg"
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={addImageUrl}
+                    className={styles.addBtn}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#4CAF50',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Add
+                  </button>
+                </div>
+                {formData.image_url.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {formData.image_url.map((url, index) => (
+                      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', background: '#f5f5f5', borderRadius: '4px' }}>
+                        <img 
+                          src={url} 
+                          alt={`Preview ${index + 1}`} 
+                          style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                          onError={(e) => e.target.style.display = 'none'}
+                        />
+                        <span style={{ flex: 1, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {url}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeImageUrl(index)}
+                          style={{
+                            padding: '4px 8px',
+                            background: '#f44336',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className={styles.formGroup}>

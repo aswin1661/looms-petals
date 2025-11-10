@@ -1,0 +1,227 @@
+"use client";
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useRouter, usePathname } from "next/navigation";
+
+type User = {
+  id: number;
+  email: string;
+  name: string | null;
+  phone: string | null;
+};
+
+type AuthContextType = {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  register: (email: string, password: string, name: string, otp: string) => Promise<{ success: boolean; message?: string }>;
+  logout: () => Promise<void>;
+  updateProfile: (data: Partial<User>) => Promise<{ success: boolean; message?: string }>;
+};
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Public routes that don't require authentication
+const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password'];
+const OPEN_ROUTES = ['/admin']; // Routes accessible to everyone (logged in or not)
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Check authentication status on mount
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  // Redirect logic - only after auth check is complete
+  useEffect(() => {
+    if (!isLoading && hasCheckedAuth) {
+      const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+      const isOpenRoute = pathname.startsWith('/admin');
+      
+      if (!user && !isPublicRoute && !isOpenRoute) {
+        // Not authenticated, redirect to login (except for open routes)
+        router.push('/login');
+      } else if (user && isPublicRoute) {
+        // Already authenticated, redirect to home (but allow open routes)
+        router.push('/');
+      }
+    }
+  }, [user, isLoading, hasCheckedAuth, pathname, router]);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include',
+        cache: 'no-store',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+      setHasCheckedAuth(true);
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setUser(data.user);
+        router.push('/');
+        return { success: true };
+      } else {
+        return { success: false, message: data.message || 'Login failed' };
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, message: 'Network error. Please try again.' };
+    }
+  };
+
+  const register = async (email: string, password: string, name: string, otp: string) => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password, name, otp }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setUser(data.user);
+        router.push('/');
+        return { success: true };
+      } else {
+        return { success: false, message: data.message || 'Registration failed' };
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      return { success: false, message: 'Network error. Please try again.' };
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      localStorage.removeItem('cart'); // Clear cart on logout
+      router.push('/login');
+    }
+  };
+
+  const updateProfile = async (data: Partial<User>) => {
+    try {
+      const response = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setUser(result.user);
+        return { success: true };
+      } else {
+        return { success: false, message: result.message || 'Update failed' };
+      }
+    } catch (error) {
+      console.error('Update profile error:', error);
+      return { success: false, message: 'Network error. Please try again.' };
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        register,
+        logout,
+        updateProfile,
+      }}
+    >
+      {isLoading ? (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #f5f5f5 0%, #e8d5d5 100%)'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            background: 'white',
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(122, 45, 45, 0.15)'
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              border: '4px solid #f3f3f3',
+              borderTop: '4px solid #7a2d2d',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 16px'
+            }} />
+            <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Loading...</p>
+            <style>{`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
+          </div>
+        </div>
+      ) : (
+        children
+      )}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

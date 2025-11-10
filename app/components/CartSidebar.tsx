@@ -62,12 +62,25 @@ export default function CartSidebar() {
               {items.map((item, index) => {
                 const price = item.discount_price || item.price;
                 const itemKey = `${item.id}-${item.selectedSize || ""}-${item.selectedColor || ""}`;
+                
+                // Parse image_url to get the first image if it's an array
+                let imageUrl = 'https://picsum.photos/400/600';
+                if (item.image_url) {
+                  try {
+                    const images = JSON.parse(item.image_url);
+                    imageUrl = Array.isArray(images) && images.length > 0 && images[0] 
+                      ? images[0] 
+                      : (item.image_url || 'https://picsum.photos/400/600');
+                  } catch {
+                    imageUrl = item.image_url || 'https://picsum.photos/400/600';
+                  }
+                }
 
                 return (
                   <div key={index} className={styles.item}>
                     <div className={styles.itemImage}>
                       <Image
-                        src={item.image_url}
+                        src={imageUrl}
                         alt={item.name}
                         fill
                         sizes="100px"

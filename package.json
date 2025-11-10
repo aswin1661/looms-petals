@@ -6,21 +6,27 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean": "rm -rf .next out node_modules/.cache",
+    "build:prod": "npm run clean && npm ci && npm run build",
+    "test:build": "npm run build && npm start"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.80.0",
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "bootstrap": "^5.3.8",
     "dotenv": "^17.2.3",
     "mongoose": "^8.19.3",
     "next": "16.0.1",
     "react": "19.2.0",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "resend": "^6.4.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

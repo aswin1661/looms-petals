@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 import CartIcon from './CartIcon';
 
 // Simple inline SVG icon components (stroke inherits currentColor)
@@ -105,7 +106,9 @@ const Icon = {
 export function Navbar() {
   const [active, setActive] = useState('Diamond');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
   const router = useRouter();
+  const { user, logout } = useAuth();
 
   const menu = [
     { key: 'All Jewellery', icon: <Icon.Earrings />, label: 'All Jewellery' },
@@ -148,12 +151,45 @@ export function Navbar() {
 
         <div className="tnq-nav-actions">
           <CartIcon />
-          <button 
-            className="tnq-about-btn tnq-desktop-about"
-            onClick={() => router.push('/about')}
-          >
-            About Us
-          </button>
+          <div className="tnq-account-wrapper">
+            <button 
+              className="tnq-account-btn tnq-desktop-account"
+              onClick={() => setShowAccountMenu(!showAccountMenu)}
+            >
+              <Icon.User />
+              <span>Account</span>
+            </button>
+            {showAccountMenu && (
+              <div className="tnq-account-menu">
+                <div className="tnq-account-menu-header">
+                  <p className="tnq-account-name">{user?.name || 'User'}</p>
+                  <p className="tnq-account-email">{user?.email}</p>
+                </div>
+                <div className="tnq-account-menu-items">
+                  <button
+                    onClick={() => {
+                      router.push('/profile');
+                      setShowAccountMenu(false);
+                    }}
+                    className="tnq-account-menu-item"
+                  >
+                    <Icon.User />
+                    <span>My Profile</span>
+                  </button>
+                  <button
+                    onClick={async () => {
+                      await logout();
+                      setShowAccountMenu(false);
+                    }}
+                    className="tnq-account-menu-item tnq-logout"
+                  >
+                    <span>🚪</span>
+                    <span>Logout</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -183,15 +219,26 @@ export function Navbar() {
             <span className="tnq-menu-label">{m.label}</span>
           </button>
         ))}
-        {/* About Us Button in Mobile Menu */}
+        {/* Account Button in Mobile Menu */}
         <button
-          className="tnq-mobile-menu-item tnq-mobile-about"
+          className="tnq-mobile-menu-item tnq-mobile-account"
           onClick={() => {
-            router.push('/about');
+            router.push('/profile');
             setMobileMenuOpen(false);
           }}
         >
-            <span className="tnq-menu-label">About Us</span>
+          <Icon.User />
+          <span className="tnq-menu-label">My Account</span>
+        </button>
+        <button
+          className="tnq-mobile-menu-item tnq-mobile-logout"
+          onClick={async () => {
+            await logout();
+            setMobileMenuOpen(false);
+          }}
+        >
+          <span className="tnq-menu-icon">🚪</span>
+          <span className="tnq-menu-label">Logout</span>
         </button>
       </div>
     </nav>
