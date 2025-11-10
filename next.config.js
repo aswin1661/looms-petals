@@ -2,12 +2,28 @@
 const nextConfig = {
   transpilePackages: ['bootstrap'],
   images: {
-    // Allow external images from Picsum
-    domains: ['picsum.photos'],
-    // Alternatively, use remotePatterns if you want stricter matching:
-    // remotePatterns: [
-    //   { protocol: 'https', hostname: 'picsum.photos', pathname: '/**' },
-    // ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.nikkar.in',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'plus.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+    ],
   },
 }
 

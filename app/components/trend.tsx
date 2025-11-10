@@ -1,81 +1,108 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./Trend.module.css";
 
-type TrendItem = {
+type Product = {
 	id: number;
-	title: string;
+	name: string;
 	category: string;
 	price: number;
-	img: string;
+	discount_price: number | null;
+	image_url: string;
+	status: string;
 };
-
-// Simple pseudo data using picsum images - exactly 4 items matching reference
-const useTrendData = (): TrendItem[] => {
-	return useMemo(
-		() => [
-			{
-				id: 1,
-				title: "Hello Kitty: Pink Bow",
-				category: "Oversized T-Shirts",
-				price: 999,
-				img: "https://picsum.photos/seed/trend1/800/1000",
-			},
-			{
-				id: 2,
-				title: "Ombre Sweater: Snowberry",
-				category: "Sweaters",
-				price: 1699,
-				img: "https://picsum.photos/seed/trend2/800/1000",
-			},
-			{
-				id: 3,
-				title: "Disney: Keep Swimming",
-				category: "T-Shirts",
-				price: 799,
-				img: "https://picsum.photos/seed/trend3/800/1000",
-			},
-			{
-				id: 4,
-				title: "Solids: Charcoal (Straight Fit)",
-				category: "Jeans",
-				price: 1899,
-				img: "https://picsum.photos/seed/trend4/800/1000",
-			},
-		],
-		[]
-	);
-};
-
-const CARD_SCROLL_AMOUNT = 1; // number of cards to move per click
 
 export default function Trend() {
-	const items = useTrendData();
+	const router = useRouter();
+	const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const fetchNewArrivals = async () => {
+			try {
+				const response = await fetch("/api/admin/products");
+				const data = await response.json();
+
+				if (data.success) {
+					// Filter products with status "new_arrival"
+					const arrivals = data.data.filter(
+						(product: Product) => product.status === "new_arrival"
+					);
+					setNewArrivals(arrivals.slice(0, 4)); // Show only first 4
+				}
+			} catch (error) {
+				console.error("Failed to fetch new arrivals:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchNewArrivals();
+	}, []);
+
+	if (loading) {
+		return (
+			<section className={styles.wrapper} aria-label="Early Winter Drops">
+				<h2 className={styles.sectionTitle}>EARLY WINTER DROPS</h2>
+				<div className={styles.container}>
+					{[1, 2, 3, 4].map((i) => (
+						<article key={i} className={styles.card}>
+							<div className={styles.imageBox} style={{ background: "#f0f0f0" }}>
+								<div style={{ height: "100%", animation: "pulse 1.5s infinite" }} />
+							</div>
+						</article>
+					))}
+				</div>
+			</section>
+		);
+	}
+
+	if (newArrivals.length === 0) {
+		return null;
+	}
 
 	return (
 		<section className={styles.wrapper} aria-label="Early Winter Drops">
-                <h2 className={styles.sectionTitle}>EARLY WINTER DROPS</h2>
+			<h2 className={styles.sectionTitle}>EARLY WINTER DROPS</h2>
 			<div className={styles.container}>
-				{items.map((item, idx) => (
-					<article key={item.id} className={styles.card}>
+				{newArrivals.map((product, idx) => {
+					const slug = product.name
+						.toLowerCase()
+						.replace(/[^a-z0-9]+/g, "-")
+						.replace(/^-+|-+$/g, "");
+					return (
+						<article
+							key={product.id}
+							className={styles.card}
+							onClick={() => router.push(`/product/${slug}-${product.id}`)}
+							style={{ cursor: "pointer" }}
+						>
 							<span className={styles.index} aria-hidden>
 								{idx + 1}
 							</span>
-						<div className={styles.imageBox}>
-							<img src={item.img} alt={item.title} loading="lazy" />
-						</div>
-						<div className={styles.meta}>
-							<h3 className={styles.title}>{item.title}</h3>
-							<div className={styles.category}>{item.category}</div>
-							<div className={styles.price}>₹ {item.price}</div>
-						</div>
-					</article>
-				))}
+							<div className={styles.imageBox}>
+								<img
+									src={
+										product.image_url ||
+										`https://picsum.photos/seed/${product.id}/800/1000`
+									}
+									alt={product.name}
+									loading="lazy"
+								/>
+							</div>
+							<div className={styles.meta}>
+								<h3 className={styles.title}>{product.name}</h3>
+								<div className={styles.category}>{product.category}</div>
+								<div className={styles.price}>
+									₹ {product.discount_price || product.price}
+								</div>
+							</div>
+						</article>
+					);
+				})}
 			</div>
-
-			
-
 		</section>
 	);
 }

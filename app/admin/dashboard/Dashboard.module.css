@@ -184,6 +184,64 @@
   margin: 0 0 12px 0;
 }
 
+.cardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  font-size: 13px;
+  color: #666;
+}
+
+.metaItem strong {
+  color: #333;
+  text-transform: capitalize;
+}
+
+.statusBadge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusBadge.normal {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.statusBadge.trending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.statusBadge.featured {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.statusBadge.most_bought {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.statusBadge.new_arrival {
+  background: #fce7f3;
+  color: #9f1239;
+}
+
+.statusBadge.sale {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 .cardPrice {
   display: flex;
   align-items: center;

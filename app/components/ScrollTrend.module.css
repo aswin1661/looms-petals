@@ -8,6 +8,43 @@
   background: white;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 4rem 4vh;
+}
+
+.sectionTitle {
+  text-align: left;
+  text-transform: uppercase;
+  font-size: clamp(24px, 3.6vw, 33.6px);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  margin: 0;
+  color: #2d2d2d;
+}
+
+.viewAllBtn {
+  background: linear-gradient(135deg, #7a2d2d 0%, #5a1f1f 100%);
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(122, 45, 45, 0.2);
+  text-transform: uppercase;
+}
+
+.viewAllBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(122, 45, 45, 0.3);
+}
+
 .carousel {
   display: flex;
   gap: 24px;
@@ -18,63 +55,73 @@
   scrollbar-width: none;
 }
 
-
-.sectionTitle {
-  text-align: left;
-  margin-left: 4rem;
-  text-transform: uppercase;
-  font-size: clamp(24px, 3.6vw, 33.6px);
-  font-weight: 900;
-  letter-spacing: 0.05em;
-  margin-right: 0;
-  margin-bottom: 4vh;
-  margin-top: 0;
-  color: #2d2d2d;
-}
-
 .carousel::-webkit-scrollbar {
   display: none;
+}
+
+.productCount {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .card {
   position: relative;
   margin-top: 5vh;
-  flex: 0 0 320px; /* visual width similar to screenshot */
+  flex: 0 0 320px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  transition: transform 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+}
+
+.card:hover .innerPanel {
+  box-shadow: 0 20px 40px rgba(122, 45, 45, 0.15);
 }
 
 .innerPanel {
   position: relative;
   height: 420px;
-  padding: 28px 22px 130px; /* leave space at bottom for shoe */
-  border-radius: 28px;
-  background: #f6dfe6; /* soft pink */
-  box-shadow: 0 8px 22px rgba(255, 155, 175, 0.12);
-  overflow: hidden; /* allow image to extend below panel */
+  padding: 28px 22px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fdfbfb 0%, #f8f4f5 100%);
+  border: 2px solid #e8d5d9;
+  box-shadow: 0 8px 24px rgba(122, 45, 45, 0.08);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-/* Overlay inner border ABOVE content so it never hides behind the image */
-.innerPanel::after {
+.innerPanel::before {
   content: "";
   position: absolute;
-  inset: 0; /* border aligns to panel sides */
-  border: 6px solid #eec8d3; /* visible ring at the edges */
-  border-radius: 28px; /* match panel radius */
-  pointer-events: none;
-  z-index: 2; /* ensure it's above the image */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+  z-index: 1;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .innerPanel::before {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.75) 100%);
 }
 
 .logoContainer {
   position: relative;
   height: 40px;
-  margin: 4px auto 24px;
+  margin: 0 auto 24px;
+  z-index: 2;
 }
 
 .brandText {
@@ -82,88 +129,114 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
-  color: #111;
-  letter-spacing: 1px;
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .meta {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  margin-bottom: 12px;
+  z-index: 2;
+  position: relative;
 }
 
 .priceType {
-  font-size: 18px;
-  color: #222;
-  letter-spacing: 1px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 1.5px;
   text-transform: uppercase;
+  font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .price {
-  font-size: 36px;
-  font-weight: 800;
-  color: #000;
+  font-size: 40px;
+  font-weight: 900;
+  color: white;
   display: flex;
   align-items: center;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .rupee {
-  font-size: 24px;
-  margin-right: 2px;
+  font-size: 26px;
+  margin-right: 4px;
+  font-weight: 700;
 }
 
 .discount {
   font-size: 16px;
-  color: #ff4444;
-  font-weight: bold;
+  color: #ffeb3b;
+  font-weight: 700;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .discountBig {
-  font-size: 38px;
+  font-size: 42px;
   font-weight: 900;
+  color: #ffeb3b;
+  line-height: 1;
+  letter-spacing: -1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .imageContainer {
   position: absolute;
-  left: 10%;
-  border-radius: 28px 28px 0 0;
-  right: 10%;
-  bottom: -25px;
-  height: 250px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
-/* Apply rounded corners to actual <img> elements rendered by next/image */
+.card:hover .imageContainer :global(img) {
+  transform: scale(1.08);
+}
+
 .imageContainer :global(img) {
-  border-radius: 28px 28px 0 0; /* align with panel radius */
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-/* Keep logos unrounded (logos are usually flat) */
 
 .navButton {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: white;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e8d5d9;
+  box-shadow: 0 4px 12px rgba(122, 45, 45, 0.1);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  color: #333;
+  color: #7a2d2d;
   transition: all 0.3s ease;
   z-index: 2;
 }
 
 .navButton:hover {
-  background: #f5f5f5;
+  background: #7a2d2d;
+  color: white;
+  border-color: #7a2d2d;
+  box-shadow: 0 6px 16px rgba(122, 45, 45, 0.2);
+  transform: translateY(-50%) scale(1.1);
 }
 
 .prevButton {
@@ -180,11 +253,21 @@
     padding: 30px 0 80px;
   }
 
+  .header {
+    margin: 0 2rem 3vh;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
   .sectionTitle {
-    margin-left: 2rem;
-    margin-right: 2rem;
     font-size: clamp(20px, 5vw, 28px);
-    margin-bottom: 3vh;
+  }
+
+  .viewAllBtn {
+    padding: 10px 24px;
+    font-size: 13px;
+    align-self: stretch;
   }
 
   .carousel {
@@ -198,13 +281,7 @@
 
   .innerPanel {
     height: 380px;
-    padding: 24px 18px 110px;
-    border-radius: 24px;
-  }
-
-  .innerPanel::after {
-    border: 5px solid #eec8d3;
-    border-radius: 24px;
+    padding: 24px 18px;
   }
 
   .logoContainer {
@@ -232,14 +309,9 @@
     font-size: 34px;
   }
 
-  .imageContainer {
-    height: 220px;
-    bottom: -50px;
-  }
-
   .navButton {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     font-size: 18px;
   }
 
@@ -258,12 +330,19 @@
     padding: 20px 0 60px;
   }
 
+  .header {
+    margin: 0 1rem 2vh;
+    gap: 12px;
+  }
+
   .sectionTitle {
-    margin-left: 1rem;
-    margin-right: 1rem;
     font-size: clamp(18px, 6vw, 24px);
-    margin-bottom: 2vh;
     letter-spacing: 0.03em;
+  }
+
+  .viewAllBtn {
+    padding: 10px 20px;
+    font-size: 12px;
   }
 
   .carousel {
@@ -277,13 +356,7 @@
 
   .innerPanel {
     height: 340px;
-    padding: 20px 16px 90px;
-    border-radius: 20px;
-  }
-
-  .innerPanel::after {
-    border: 4px solid #eec8d3;
-    border-radius: 20px;
+    padding: 20px 16px;
   }
 
   .logoContainer {
@@ -315,16 +388,9 @@
     font-size: 30px;
   }
 
-  .imageContainer {
-    height: 190px;
-    bottom: -45px;
-    left: 8%;
-    right: 8%;
-  }
-
   .navButton {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     font-size: 16px;
     display: none;
   }

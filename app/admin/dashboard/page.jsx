@@ -205,6 +205,14 @@ export default function AdminDashboard() {
               <div className={styles.cardBody}>
                 <h3 className={styles.cardTitle}>{product.name}</h3>
                 <p className={styles.cardCategory}>{product.category}</p>
+                <div className={styles.cardMeta}>
+                  <span className={styles.metaItem}>
+                    <strong>Type:</strong> {product.type || 'clothing'}
+                  </span>
+                  <span className={`${styles.statusBadge} ${styles[product.status || 'normal']}`}>
+                    {(product.status || 'normal').replace('_', ' ').toUpperCase()}
+                  </span>
+                </div>
                 <div className={styles.cardPrice}>
                   <span className={styles.price}>₹{product.price}</span>
                   {product.discount_price && (

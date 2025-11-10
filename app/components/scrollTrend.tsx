@@ -1,97 +1,152 @@
 'use client'
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from './ScrollTrend.module.css';
 
 interface BrandCard {
   brand: string;
-  logo?: string; // optional; we will use text when omitted
   price: string;
-  priceType: 'MIN.' | 'STARTING' | 'UP TO';
-  discount?: string;
+  priceType: 'MIN.' | 'STARTING';
   image: string;
+  productCount: number;
 }
-
-const brandCards: BrandCard[] = [
-  {
-    brand: 'SKECHERS',
-    price: '1799',
-    priceType: 'UP TO',
-    discount: '40% OFF',
-    image: 'https://picsum.photos/id/237/800/600'
-  },
-  {
-    brand: 'MONROW',
-    price: '3999',
-    priceType: 'MIN.',
-    image: 'https://picsum.photos/id/238/800/600'
-  },
-  {
-    brand: 'U.S. POLO ASSN.',
-    price: '3299',
-    priceType: 'MIN.',
-    image: 'https://picsum.photos/id/239/800/600'
-  },
-  {
-    brand: 'LOTTO',
-    price: '3999',
-    priceType: 'MIN.',
-    image: 'https://picsum.photos/id/240/800/600'
-  },
-  {
-    brand: 'Hush Puppies',
-    price: '3999',
-    priceType: 'MIN.',
-    image: 'https://picsum.photos/id/241/800/600'
-  }
-];
 
 const ScrollTrend = () => {
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+  const [brandCards, setBrandCards] = useState<BrandCard[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const response = await fetch('/api/admin/products');
+        const data = await response.json();
+
+        if (data.success) {
+          // Filter clothing products only
+          const clothingProducts = data.data.filter(
+            (product: any) => product.type === 'clothing'
+          );
+
+          // Group by brand and get minimum price and image for each
+          const brandMap = new Map<string, { minPrice: number; image: string; count: number }>();
+          
+          clothingProducts.forEach((product: any) => {
+            if (product.brand) {
+              const price = product.discount_price || product.price;
+              const existing = brandMap.get(product.brand);
+              
+              if (!existing || price < existing.minPrice) {
+                brandMap.set(product.brand, {
+                  minPrice: price,
+                  image: product.image_url || `https://picsum.photos/seed/${product.brand}/800/600`,
+                  count: existing ? existing.count + 1 : 1
+                });
+              } else {
+                brandMap.set(product.brand, {
+                  ...existing,
+                  count: existing.count + 1
+                });
+              }
+            }
+          });
+
+          // Convert to array and take first 4
+          const brands = Array.from(brandMap.entries())
+            .map(([brand, data]) => ({
+              brand,
+              price: data.minPrice.toString(),
+              priceType: 'MIN.' as const,
+              image: data.image,
+              productCount: data.count
+            }))
+            .slice(0, 4);
+
+          setBrandCards(brands);
+        }
+      } catch (error) {
+        console.error('Failed to fetch brands:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBrands();
+  }, []);
 
   const scrollByCards = (dir: 'prev' | 'next') => {
     const el = trackRef.current;
     if (!el) return;
     const card = el.querySelector(`.${styles.card}`) as HTMLElement | null;
-    const gap = 24; // must match CSS gap
+    const gap = 24;
     const amount = card ? card.offsetWidth + gap : 320;
     el.scrollBy({ left: dir === 'next' ? amount : -amount, behavior: 'smooth' });
   };
 
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <h2 className={styles.sectionTitle}>TRENDING BRANDS</h2>
+        <div className={styles.carousel}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className={styles.card}>
+              <div className={styles.innerPanel} style={{ background: '#f0f0f0' }}>
+                <div style={{ height: '100%' }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (brandCards.length === 0) {
+    return null;
+  }
+
   return (
     <div className={styles.container}>
+      <div className={styles.header}>
         <h2 className={styles.sectionTitle}>TRENDING BRANDS</h2>
+        <button 
+          className={styles.viewAllBtn}
+          onClick={() => router.push('/brands')}
+        >
+          View All Brands →
+        </button>
+      </div>
       <div className={styles.carousel} ref={trackRef}>
         {brandCards.map((card, index) => (
-          <div key={index} className={styles.card}>
+          <div 
+            key={index} 
+            className={styles.card}
+            onClick={() => router.push(`/brands/${encodeURIComponent(card.brand.toLowerCase().replace(/\s+/g, '-'))}`)}
+            style={{ cursor: 'pointer' }}
+          >
             <div className={styles.innerPanel}>
               <div className={styles.logoContainer}>
-                {card.logo ? (
-                  <Image src={card.logo} alt={card.brand} fill style={{ objectFit: 'contain' }} />
-                ) : (
-                  <div className={styles.brandText}>{card.brand}</div>
-                )}
+                <div className={styles.brandText}>{card.brand}</div>
               </div>
 
               <div className={styles.meta}>
-                {card.priceType === 'UP TO' ? (
-                  <>
-                    <span className={styles.priceType}>UP TO</span>
-                    <div className={styles.discountBig}>{card.discount}</div>
-                  </>
-                ) : (
-                  <>
-                    <span className={styles.priceType}>{card.priceType}</span>
-                    <div className={styles.price}>
-                      <span className={styles.rupee}>₹</span>
-                      {card.price}
-                    </div>
-                  </>
-                )}
+                <span className={styles.priceType}>{card.priceType}</span>
+                <div className={styles.price}>
+                  <span className={styles.rupee}>₹</span>
+                  {card.price}
+                </div>
+                <span className={styles.productCount}>{card.productCount} Products</span>
               </div>
-              {/* Image moved inside innerPanel so it clips within the rounded/bordered panel */}
+              
               <div className={styles.imageContainer}>
-                <Image src={card.image} alt={`${card.brand} Product`} fill style={{ objectFit: 'contain' }} />
+                <Image 
+                  src={card.image} 
+                  alt={`${card.brand} Product`} 
+                  fill 
+                  sizes="320px"
+                  quality={85}
+                />
               </div>
             </div>
           </div>
@@ -103,8 +158,6 @@ const ScrollTrend = () => {
       <button className={`${styles.navButton} ${styles.nextButton}`} onClick={() => scrollByCards('next')} aria-label="Next">
         <span>❯</span>
       </button>
-
-      
     </div>
   );
 };
