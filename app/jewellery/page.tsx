@@ -30,11 +30,18 @@ export default function JewelleryPage() {
 			const data = await response.json();
 			
 			if (data.success) {
+				console.log('Total products:', data.data.length);
+				console.log('Sample categories:', data.data.slice(0, 5).map((p: any) => p.category));
+				
 				// Filter to get only jewellery items
 				const jewelleryProducts = data.data.filter((product: Product) => 
 					product.category.toLowerCase() === 'jewellery' || 
 					product.category.toLowerCase() === 'jewelry'
 				);
+				
+				console.log('Jewellery products found:', jewelleryProducts.length);
+				console.log('Jewellery products:', jewelleryProducts);
+				
 				setProducts(jewelleryProducts);
 			}
 		} catch (error) {
@@ -111,6 +118,8 @@ export default function JewelleryPage() {
 							imageUrl = product.image_url || imageUrl;
 						}
 					}
+					
+					console.log(`Product: ${product.name}, Image URL: ${imageUrl}`);
 
 					const discount = product.discount_price
 						? Math.round(((product.price - product.discount_price) / product.price) * 100)
@@ -127,6 +136,10 @@ export default function JewelleryPage() {
 									src={imageUrl}
 									alt={product.name}
 									className={styles.productImage}
+									onError={(e) => {
+										console.error(`Failed to load image for ${product.name}: ${imageUrl}`);
+										e.currentTarget.src = `https://picsum.photos/seed/${product.id}/600/700`;
+									}}
 								/>
 								{product.status !== "normal" && product.status !== "trending" && (
 									<span className={`${styles.badge} ${styles[product.status]}`}>

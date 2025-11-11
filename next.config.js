@@ -53,6 +53,21 @@ const nextConfig = {
         hostname: 'encrypted-tbn1.gstatic.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'i.ibb.co',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'i.ibb.co',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pinimg.com',
+        pathname: '/**',
+      },
     ],
   },
 }

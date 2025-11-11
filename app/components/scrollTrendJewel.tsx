@@ -1,7 +1,6 @@
 'use client'
 import React, { useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import styles from './ScrollTrend.module.css';
 
 interface BrandCard {
@@ -25,10 +24,18 @@ const ScrollTrendJewel = () => {
         const data = await response.json();
 
         if (data.success) {
+          console.log('All products:', data.data); // Debug log
+          
           // Filter jewelry products only
           const jewelryProducts = data.data.filter(
-            (product: any) => product.type === 'jewelry'
+            (product: any) => {
+              const category = product.category?.toLowerCase();
+              console.log('Product category:', category); // Debug log
+              return category === 'jewellery' || category === 'jewelry';
+            }
           );
+
+          console.log('Jewelry products found:', jewelryProducts.length); // Debug log
 
           // Group by brand and get minimum price and image for each
           const brandMap = new Map<string, { minPrice: number; image: string; count: number }>();
@@ -50,6 +57,8 @@ const ScrollTrendJewel = () => {
                   imageUrl = product.image_url || imageUrl;
                 }
               }
+              
+              console.log('Brand:', product.brand, 'Image:', imageUrl); // Debug log
               
               if (!existing || price < existing.minPrice) {
                 brandMap.set(product.brand, {
@@ -77,6 +86,7 @@ const ScrollTrendJewel = () => {
             }))
             .slice(0, 4);
 
+          console.log('Final brand cards:', brands); // Debug log
           setBrandCards(brands);
         }
       } catch (error) {
@@ -153,12 +163,21 @@ const ScrollTrendJewel = () => {
               </div>
               
               <div className={styles.imageContainer}>
-                <Image 
+                <img 
                   src={card.image} 
-                  alt={`${card.brand} Product`} 
-                  fill 
-                  sizes="320px"
-                  quality={85}
+                  alt={`${card.brand} Product`}
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0
+                  }}
+                  onError={(e) => {
+                    console.error(`Failed to load image for ${card.brand}: ${card.image}`);
+                    e.currentTarget.src = `https://picsum.photos/seed/${card.brand}/800/600`;
+                  }}
                 />
               </div>
             </div>

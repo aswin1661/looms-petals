@@ -25,9 +25,12 @@ const ScrollTrend = () => {
         const data = await response.json();
 
         if (data.success) {
-          // Filter clothing products only
+          // Filter clothing products only (exclude jewellery)
           const clothingProducts = data.data.filter(
-            (product: any) => product.type === 'clothing'
+            (product: any) => {
+              const category = product.category?.toLowerCase();
+              return category !== 'jewellery' && category !== 'jewelry';
+            }
           );
 
           // Group by brand and get minimum price and image for each

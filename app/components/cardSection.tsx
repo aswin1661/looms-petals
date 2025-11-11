@@ -107,13 +107,17 @@ export default function CardSection() {
 							className={styles.productCard}
 							onClick={() => router.push(`/product/${slug}-${product.id}`)}
 						>
-							<div className={styles.imageWrapper}>
-								<img
-									src={imageUrl}
-									alt={product.name}
-									className={styles.productImage}
-								/>
-								{product.status !== "normal" && product.status !== "trending" && (
+						<div className={styles.imageWrapper}>
+							<img
+								src={imageUrl}
+								alt={product.name}
+								className={styles.productImage}
+								onError={(e) => {
+									console.error(`Failed to load image for ${product.name}: ${imageUrl}`);
+									e.currentTarget.src = `https://picsum.photos/seed/${product.id}/600/700`;
+								}}
+							/>
+							{product.status !== "normal" && product.status !== "trending" && (
 									<span className={`${styles.badge} ${styles[product.status]}`}>
 										{product.status.replace("_", " ").toUpperCase()}
 									</span>

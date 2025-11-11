@@ -26,7 +26,10 @@ export default function JewelryBrandsPage() {
         if (data.success) {
           // Filter jewelry products only
           const jewelryProducts = data.data.filter(
-            (product: any) => product.type === "jewelry"
+            (product: any) => {
+              const category = product.category?.toLowerCase();
+              return category === 'jewellery' || category === 'jewelry';
+            }
           );
 
           // Group by brand
@@ -37,11 +40,24 @@ export default function JewelryBrandsPage() {
               const price = product.discount_price || product.price;
               const existing = brandMap.get(product.brand);
 
+              // Parse image_url to get the first image if it's an array
+              let imageUrl = product.image_url || `https://picsum.photos/seed/${product.brand}/800/600`;
+              if (product.image_url) {
+                try {
+                  const images = JSON.parse(product.image_url);
+                  imageUrl = Array.isArray(images) && images.length > 0 && images[0]
+                    ? images[0]
+                    : (product.image_url || imageUrl);
+                } catch {
+                  imageUrl = product.image_url || imageUrl;
+                }
+              }
+
               if (!existing || price < existing.minPrice) {
                 brandMap.set(product.brand, {
                   minPrice: price,
                   count: existing ? existing.count + 1 : 1,
-                  image: product.image_url || `https://picsum.photos/seed/${product.brand}/800/600`
+                  image: imageUrl
                 });
               } else {
                 brandMap.set(product.brand, {
@@ -130,7 +146,14 @@ export default function JewelryBrandsPage() {
               onClick={() => router.push(`/brands/${encodeURIComponent(brand.name.toLowerCase().replace(/\s+/g, '-'))}`)}
             >
               <div className={styles.imageWrapper}>
-                <img src={brand.image} alt={brand.name} />
+                <img 
+                  src={brand.image} 
+                  alt={brand.name}
+                  onError={(e) => {
+                    console.error(`Failed to load image for brand ${brand.name}: ${brand.image}`);
+                    e.currentTarget.src = `https://picsum.photos/seed/${brand.name}/800/600`;
+                  }}
+                />
                 <div className={styles.overlay} />
               </div>
               <div className={styles.content}>
